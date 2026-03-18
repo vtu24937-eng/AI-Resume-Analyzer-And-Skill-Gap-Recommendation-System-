@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload Resume — ResumeAI</title>
+    <meta name="description"
+        content="Upload your resume and select your target job role for AI-powered skill gap analysis." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+</head>
+
+<body>
+
+    <!-- ─── Navigation ──────────────────────────────────────────────── -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a href="{{ url_for('index') }}" style="text-decoration:none;display:flex;align-items:center;gap:0.5rem;">
+                <span class="brand-icon">🎯</span>
+                <span class="brand-text">ResumeAI</span>
+            </a>
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+            <a href="{{ url_for('upload') }}" class="nav-link active">Analyze</a>
+        </div>
+    </nav>
+
+    <!-- ─── Flash Messages ────────────────────────────────────────────── -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-container">
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">
+            <span>{{ '⚠️' if category == 'error' else 'ℹ️' }}</span>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- ─── Upload Page ───────────────────────────────────────────────── -->
+    <main class="upload-main">
+        <div class="container">
+            <div class="upload-header">
+                <span class="section-tag">Step 1 of 2</span>
+                <h1 class="page-title">Analyze Your Resume</h1>
+                <p class="page-subtitle">Upload your resume and select your target role to receive a detailed AI-powered
+                    career report.</p>
+            </div>
+
+            <form id="uploadForm" action="{{ url_for('analyze') }}" method="post" enctype="multipart/form-data">
+
+                <!-- ─── File Upload ────────────────────────────── -->
+                <div class="upload-card card" id="uploadCard">
+                    <div class="card-header">
+                        <span class="card-step">📄</span>
+                        <h2>Upload Your Resume</h2>
+                        <p>Supported formats: PDF, DOCX (Max 16 MB)</p>
+                    </div>
+
+                    <div class="drop-zone" id="dropZone">
+                        <div class="drop-zone-content" id="dropContent">
+                            <div class="drop-icon">📂</div>
+                            <p class="drop-text">Drag &amp; drop your resume here</p>
+                            <p class="drop-subtext">or</p>
+                            <label for="resumeInput" class="btn btn-outline pick-btn">Browse File</label>
+                            <input type="file" id="resumeInput" name="resume" accept=".pdf,.docx" hidden required />
+                        </div>
+                        <div class="file-preview" id="filePreview" style="display:none;">
+                            <div class="file-preview-icon">📋</div>
+                            <div class="file-preview-info">
+                                <p class="file-name" id="fileName">—</p>
+                                <p class="file-size" id="fileSize">—</p>
+                            </div>
+                            <button type="button" class="file-remove-btn" id="removeFile" title="Remove file">✕</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ─── Job Role Selection ─────────────────────── -->
+                <div class="role-select-card card">
+                    <div class="card-header">
+                        <span class="card-step">🎯</span>
+                        <h2>Select Target Job Role</h2>
+                        <p>Choose the role you want to be analyzed against</p>
+                    </div>
+
+                    <div class="roles-select-grid" id="rolesSelectGrid">
+                        {% for role_name, role_data in job_roles.items() %}
+                        <label class="role-select-item" id="role-{{ loop.index }}">
+                            <input type="radio" name="job_role" value="{{ role_name }}" required />
+                            <span class="role-select-icon">{{ role_data.icon }}</span>
+                            <span class="role-select-name">{{ role_name }}</span>
+                            <span class="role-select-count">{{ role_data.required_skills | length }} skills</span>
+                            <span class="role-check">✓</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- ─── Submit Button ──────────────────────────── -->
+                <div class="submit-section">
+                    <button type="submit" class="btn btn-primary btn-xl" id="analyzeBtn">
+                        <span id="analyzeBtnText">🤖 Analyze My Resume</span>
+                        <span id="analyzeBtnLoading" style="display:none;">
+                            <span class="spinner"></span> Analyzing...
+                        </span>
+                    </button>
+                    <p class="submit-note">Analysis typically takes 5–10 seconds</p>
+                </div>
+            </form>
+
+            <!-- ─── Loading Overlay ─────────────────────────── -->
+            <div class="loading-overlay" id="loadingOverlay" style="display:none;">
+                <div class="loading-card">
+                    <div class="loading-spinner-lg"></div>
+                    <h3>Analyzing Your Resume...</h3>
+                    <div class="loading-steps" id="loadingSteps">
+                        <div class="loading-step active" data-step="1">📄 Extracting text from resume</div>
+                        <div class="loading-step" data-step="2">🔍 Parsing skills and details</div>
+                        <div class="loading-step" data-step="3">⚡ Comparing with job requirements</div>
+                        <div class="loading-step" data-step="4">📊 Calculating resume score</div>
+                        <div class="loading-step" data-step="5">💡 Generating recommendations</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ─── Footer ────────────────────────────────────────────────────── -->
+    <footer class="footer">
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <span class="brand-icon">🎯</span>
+                <span class="brand-text">ResumeAI</span>
+            </div>
+            <p class="footer-note">Open Source • Free Forever • Privacy First</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>

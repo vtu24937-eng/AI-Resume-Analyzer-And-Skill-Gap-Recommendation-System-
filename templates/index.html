@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Resume Analyzer — Smart Career Intelligence</title>
+  <meta name="description" content="AI-powered resume analyzer that extracts your skills, identifies gaps, and recommends learning paths for your target job role." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+</head>
+<body>
+
+  <!-- ─── Navigation ──────────────────────────────────────────────── -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="brand-icon">🎯</span>
+      <span class="brand-text">ResumeAI</span>
+    </div>
+    <div class="nav-links">
+      <a href="{{ url_for('index') }}" class="nav-link active">Home</a>
+      <a href="{{ url_for('upload') }}" class="nav-link">Analyze</a>
+    </div>
+    <a href="{{ url_for('upload') }}" class="btn btn-primary nav-cta">Get Started</a>
+  </nav>
+
+  <!-- ─── Hero ─────────────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-bg-orbs">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+    </div>
+    <div class="container hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span> AI-Powered Career Intelligence
+      </div>
+      <h1 class="hero-title">
+        Unlock Your Career<br>
+        <span class="gradient-text">Potential With AI</span>
+      </h1>
+      <p class="hero-subtitle">
+        Upload your resume, choose your dream role, and get instant AI analysis —
+        skill gaps identified, learning roadmaps generated, career score calculated.
+      </p>
+      <div class="hero-actions">
+        <a href="{{ url_for('upload') }}" class="btn btn-primary btn-lg">
+          <span>🚀</span> Analyze My Resume
+        </a>
+        <a href="#how-it-works" class="btn btn-ghost btn-lg">
+          See How It Works
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="stat-num">6+</span>
+          <span class="stat-label">Job Roles</span>
+        </div>
+        <div class="hero-stat">
+          <span class="stat-num">100+</span>
+          <span class="stat-label">Skills Tracked</span>
+        </div>
+        <div class="hero-stat">
+          <span class="stat-num">Free</span>
+          <span class="stat-label">Always</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── How It Works ──────────────────────────────────────────────── -->
+  <section id="how-it-works" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Process</span>
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-subtitle">Four simple steps to career clarity</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">01</div>
+          <div class="step-icon">📄</div>
+          <h3>Upload Resume</h3>
+          <p>Upload your resume in PDF or DOCX format. Our system securely processes your document.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">02</div>
+          <div class="step-icon">🎯</div>
+          <h3>Select Job Role</h3>
+          <p>Choose your target role from our curated list of in-demand tech positions.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">03</div>
+          <div class="step-icon">🤖</div>
+          <h3>AI Analysis</h3>
+          <p>Our AI extracts skills, education, experience, and certifications from your resume.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">04</div>
+          <div class="step-icon">📊</div>
+          <h3>Get Results</h3>
+          <p>Receive a detailed report with skill gaps, a resume score, and personalized recommendations.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Features ─────────────────────────────────────────────────── -->
+  <section class="section section-dark">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Features</span>
+        <h2 class="section-title">Everything You Need</h2>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🔍</div>
+          <h3>Smart Extraction</h3>
+          <p>Automatically extracts name, email, phone, education, skills, experience, and certifications from your resume.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>Skill Gap Analysis</h3>
+          <p>Instantly identifies which skills you have and which ones you need to land your target role.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📈</div>
+          <h3>Resume Scoring</h3>
+          <p>Get a comprehensive resume score with weighted evaluation of skills, experience, and education.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🗺️</div>
+          <h3>Learning Roadmaps</h3>
+          <p>Personalized learning recommendations with resources, timelines, and priority levels.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💡</div>
+          <h3>Career Advice</h3>
+          <p>Role-specific career improvement tips from industry best practices.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3>Privacy First</h3>
+          <p>Your resume data is processed locally and stored securely in your own database.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Job Roles ─────────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Supported Roles</span>
+        <h2 class="section-title">Which Role Are You Targeting?</h2>
+      </div>
+      <div class="roles-grid">
+        {% for role_name, role_data in job_roles.items() %}
+        <a href="{{ url_for('upload') }}" class="role-card">
+          <span class="role-icon">{{ role_data.icon }}</span>
+          <span class="role-name">{{ role_name }}</span>
+          <span class="role-count">{{ role_data.required_skills | length }} skills tracked</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── CTA ───────────────────────────────────────────────────────── -->
+  <section class="cta-section">
+    <div class="container cta-content">
+      <h2>Ready to Bridge Your Skill Gap?</h2>
+      <p>Upload your resume now and get your personalized career intelligence report in seconds.</p>
+      <a href="{{ url_for('upload') }}" class="btn btn-primary btn-lg">
+        🚀 Start Free Analysis
+      </a>
+    </div>
+  </section>
+
+  <!-- ─── Footer ────────────────────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="brand-icon">🎯</span>
+        <span class="brand-text">ResumeAI</span>
+      </div>
+      <p class="footer-note">AI-Based Resume Analyzer & Skill Gap Recommendation System</p>
+      <p class="footer-note">Built with Python, Flask, spaCy &amp; ❤️ — Open Source</p>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

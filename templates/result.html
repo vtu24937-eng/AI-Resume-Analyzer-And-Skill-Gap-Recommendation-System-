@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resume Analysis Results — ResumeAI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+</head>
+
+<body>
+
+    <!-- ─── Navigation ──────────────────────────────────────────────── -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a href="{{ url_for('index') }}" style="text-decoration:none;display:flex;align-items:center;gap:0.5rem;">
+                <span class="brand-icon">🎯</span>
+                <span class="brand-text">ResumeAI</span>
+            </a>
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+            <a href="{{ url_for('upload') }}" class="nav-link">New Analysis</a>
+        </div>
+        <a href="{{ url_for('upload') }}" class="btn btn-primary nav-cta">New Analysis</a>
+    </nav>
+
+    <main class="result-main">
+        <div class="container">
+
+            <!-- ─── Header Bar ──────────────────────────────────────────── -->
+            <div class="result-header">
+                <div class="result-header-left">
+                    <span class="section-tag">Analysis Complete</span>
+                    <h1 class="page-title">Resume Intelligence Report</h1>
+                    <p class="result-meta">
+                        <span class="role-badge">{{ role_icon }} {{ data.job_role }}</span>
+                        <span class="meta-sep">•</span>
+                        <span>{{ data.created_at[:10] if data.created_at else '' }}</span>
+                    </p>
+                </div>
+                <div class="result-actions-top">
+                    <button onclick="window.print()" class="btn btn-ghost">🖨️ Print</button>
+                    <a href="{{ url_for('upload') }}" class="btn btn-primary">🔄 New Analysis</a>
+                </div>
+            </div>
+
+            <!-- ─── Top Row: Profile + Score ──────────────────────────────── -->
+            <div class="result-top-row">
+
+                <!-- Candidate Profile Card -->
+                <div class="card profile-card">
+                    <div class="card-header">
+                        <h2>👤 Candidate Profile</h2>
+                    </div>
+                    <div class="profile-avatar">
+                        {{ data.candidate_name[0].upper() if data.candidate_name else '?' }}
+                    </div>
+                    <div class="profile-details">
+                        <div class="profile-name">{{ data.candidate_name or 'Unknown' }}</div>
+                        <div class="profile-field">
+                            <span class="field-icon">📧</span>
+                            <span>{{ data.email or 'Not found' }}</span>
+                        </div>
+                        <div class="profile-field">
+                            <span class="field-icon">📞</span>
+                            <span>{{ data.phone or 'Not found' }}</span>
+                        </div>
+                        <div class="profile-field">
+                            <span class="field-icon">🎯</span>
+                            <span>{{ data.job_role }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resume Score Card -->
+                <div class="card score-card">
+                    <div class="card-header">
+                        <h2>📊 Resume Score</h2>
+                    </div>
+                    <div class="score-ring-container">
+                        <svg class="score-ring" viewBox="0 0 200 200" id="scoreRing">
+                            <circle class="ring-bg" cx="100" cy="100" r="80" />
+                            <circle class="ring-fill ring-{{ score_info.color }}" cx="100" cy="100" r="80" id="ringFill"
+                                data-score="{{ data.score }}" />
+                        </svg>
+                        <div class="score-center">
+                            <span class="score-number" id="scoreNumber">0</span>
+                            <span class="score-pct">%</span>
+                            <span class="score-label score-label-{{ score_info.color }}">{{ score_info.label }}</span>
+                        </div>
+                    </div>
+                    <div class="score-breakdown">
+                        <div class="score-item">
+                            <span>Skills Match</span>
+                            <span class="score-item-val">
+                                {{ data.matching_skills | length }} / {{ (data.matching_skills | length) +
+                                (data.missing_skills | length) }}
+                            </span>
+                        </div>
+                        <div class="score-item">
+                            <span>Experience</span>
+                            <span class="score-item-val">{{ data.experience | length }} entries</span>
+                        </div>
+                        <div class="score-item">
+                            <span>Education</span>
+                            <span class="score-item-val">{{ data.education | length }} entry/entries</span>
+                        </div>
+                        <div class="score-item">
+                            <span>Certifications</span>
+                            <span class="score-item-val">{{ data.certifications | length }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback Card -->
+                <div class="card feedback-card">
+                    <div class="card-header">
+                        <h2>💬 Resume Quality Feedback</h2>
+                    </div>
+                    <div class="feedback-list">
+                        {% for item in feedback %}
+                        <div class="feedback-item feedback-{{ item.type }}">
+                            <span class="feedback-icon">
+                                {% if item.type == 'success' %}✅
+                                {% elif item.type == 'warning' %}⚠️
+                                {% else %}ℹ️{% endif %}
+                            </span>
+                            <span>{{ item.msg }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── Skills Row ─────────────────────────────────────────────── -->
+            <div class="result-skills-row">
+
+                <!-- Extracted Skills -->
+                <div class="card skills-card">
+                    <div class="card-header">
+                        <h2>🛠️ Detected Skills</h2>
+                        <span class="chip chip-info">{{ data.skills | length }} found</span>
+                    </div>
+                    <div class="chips-container">
+                        {% for skill in data.skills %}
+                        <span class="chip chip-neutral">{{ skill.title() }}</span>
+                        {% else %}
+                        <span class="empty-state">No skills detected. Try a more detailed resume.</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Matching Skills -->
+                <div class="card skills-card">
+                    <div class="card-header">
+                        <h2>✅ Matching Skills</h2>
+                        <span class="chip chip-success">{{ data.matching_skills | length }} matched</span>
+                    </div>
+                    <div class="chips-container">
+                        {% for skill in data.matching_skills %}
+                        <span class="chip chip-success">✓ {{ skill.title() }}</span>
+                        {% else %}
+                        <span class="empty-state">No matching skills found.</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Missing Skills -->
+                <div class="card skills-card">
+                    <div class="card-header">
+                        <h2>❌ Skill Gaps</h2>
+                        <span class="chip chip-danger">{{ data.missing_skills | length }} missing</span>
+                    </div>
+                    <div class="chips-container">
+                        {% for skill in data.missing_skills %}
+                        <span class="chip chip-danger">✗ {{ skill.title() }}</span>
+                        {% else %}
+                        <span class="empty-state">No skill gaps! You match all required skills.</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── Education & Experience ─────────────────────────────────── -->
+            <div class="result-edu-exp-row">
+
+                <!-- Education -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>🎓 Education</h2>
+                    </div>
+                    {% if data.education %}
+                    <ul class="timeline-list">
+                        {% for entry in data.education %}
+                        <li class="timeline-item">
+                            <span class="timeline-dot"></span>
+                            <span>{{ entry }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="empty-state">No education entries found.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Experience -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>💼 Experience</h2>
+                    </div>
+                    {% if data.experience %}
+                    <ul class="timeline-list">
+                        {% for entry in data.experience %}
+                        <li class="timeline-item">
+                            <span class="timeline-dot timeline-dot-blue"></span>
+                            <span>{{ entry }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="empty-state">No work experience entries found.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Certifications -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>🏆 Certifications</h2>
+                    </div>
+                    {% if data.certifications %}
+                    <ul class="timeline-list">
+                        {% for cert in data.certifications %}
+                        <li class="timeline-item">
+                            <span class="timeline-dot timeline-dot-gold"></span>
+                            <span>{{ cert }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="empty-state">No certifications found.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- ─── Recommendations ───────────────────────────────────────── -->
+            <div class="card reco-card">
+                <div class="card-header">
+                    <h2>🗺️ Skill Learning Roadmap</h2>
+                    <p>Personalized recommendations for missing skills</p>
+                </div>
+
+                {% if recommendations.skill_recommendations %}
+                <div class="reco-grid">
+                    {% for rec in recommendations.skill_recommendations %}
+                    <div class="reco-item priority-{{ rec.priority | lower }}">
+                        <div class="reco-item-header">
+                            <span class="reco-skill">{{ rec.skill }}</span>
+                            <span class="reco-priority priority-badge-{{ rec.priority | lower }}">{{ rec.priority
+                                }}</span>
+                        </div>
+                        <div class="reco-resource">
+                            <span class="reco-label">📚 Learn from:</span>
+                            <span>{{ rec.resource }}</span>
+                        </div>
+                        <div class="reco-time">
+                            <span class="reco-label">⏱️ Est. time:</span>
+                            <span>{{ rec.estimated_time }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="empty-state" style="padding:2rem;">🎉 Great job! You have all the required skills for this
+                    role.</p>
+                {% endif %}
+            </div>
+
+            <!-- ─── Technologies to Learn ─────────────────────────────────── -->
+            {% if recommendations.technologies_to_learn %}
+            <div class="card">
+                <div class="card-header">
+                    <h2>⚙️ Technologies to Learn</h2>
+                </div>
+                <div class="tech-groups">
+                    {% for category, techs in recommendations.technologies_to_learn.items() %}
+                    <div class="tech-group">
+                        <h4 class="tech-group-title">{{ category }}</h4>
+                        <div class="chips-container">
+                            {% for tech in techs %}
+                            <span class="chip chip-tech">{{ tech.title() }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- ─── Career Tips ───────────────────────────────────────────── -->
+            {% if recommendations.career_tips %}
+            <div class="card">
+                <div class="card-header">
+                    <h2>💡 Career Improvement Suggestions</h2>
+                </div>
+                <ul class="tips-list">
+                    {% for tip in recommendations.career_tips %}
+                    <li class="tip-item">
+                        <span class="tip-icon">→</span>
+                        <span>{{ tip }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- ─── Bottom CTA ────────────────────────────────────────────── -->
+            <div class="result-cta">
+                <a href="{{ url_for('upload') }}" class="btn btn-primary btn-lg">🔄 Analyze Another Resume</a>
+                <button onclick="window.print()" class="btn btn-ghost btn-lg">🖨️ Print This Report</button>
+            </div>
+
+        </div><!-- /container -->
+    </main>
+
+    <!-- ─── Footer ────────────────────────────────────────────────────── -->
+    <footer class="footer">
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <span class="brand-icon">🎯</span>
+                <span class="brand-text">ResumeAI</span>
+            </div>
+            <p class="footer-note">AI Resume Analyzer — Open Source &amp; Free</p>
+        </div>
+    </footer>
+
+    <script>
+        // Pass score to JS for animation
+        window.RESUME_SCORE = {{ data.score }};
+    </script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>
